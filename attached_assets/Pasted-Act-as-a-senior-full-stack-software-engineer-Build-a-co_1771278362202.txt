@@ -1,0 +1,120 @@
+Act as a senior full-stack software engineer.
+
+Build a complete modern SaaS web application called “EdgeJournal” — a Trading Education + Trade Journal platform.
+
+The website must be clean, minimal, professional, and look like a real startup product (similar to Notion or Stripe style).
+
+Use:
+
+Frontend:
+	•	React (with functional components)
+	•	Tailwind CSS for styling
+	•	Responsive mobile-first design
+	•	Chart.js for analytics graphs
+
+Backend:
+	•	Node.js
+	•	Express
+	•	MongoDB
+	•	JWT authentication
+	•	REST API structure
+
+⸻
+
+Core Features:
+
+1️⃣ Landing Page
+	•	Hero section with headline:
+“Track Your Trades. Master Your Edge.”
+	•	Subheadline explaining discipline and data-driven trading
+	•	Features section (Analytics, Risk Tracking, Strategy Tagging)
+	•	Pricing section (Free vs Pro)
+	•	CTA buttons (Sign Up / Log In)
+	•	Fully responsive
+
+⸻
+
+2️⃣ Authentication System
+	•	User registration (email + password)
+	•	Login
+	•	Password hashing (bcrypt)
+	•	JWT-based authentication
+	•	Protected routes
+
+⸻
+
+3️⃣ Dashboard (After Login)
+
+Sidebar navigation:
+	•	Dashboard
+	•	Add Trade
+	•	Journal
+	•	Analytics
+	•	Settings
+
+Main Dashboard:
+	•	Total Trades
+	•	Win Rate %
+	•	Net P/L
+	•	Average Risk-Reward Ratio
+	•	Monthly performance chart
+
+⸻
+
+4️⃣ Trade Journal
+
+Trade form fields:
+	•	Trading Pair
+	•	Entry Price
+	•	Stop Loss
+	•	Take Profit
+	•	Risk %
+	•	Position Type (Buy/Sell)
+	•	Result (Win/Loss/Breakeven)
+	•	Strategy Tag
+	•	Notes
+
+Save to MongoDB under logged-in user.
+
+Display:
+	•	Trade table
+	•	Filter by strategy
+	•	Delete/edit trade
+
+⸻
+
+5️⃣ Analytics Page
+	•	Win rate chart
+	•	Monthly profit chart
+	•	Best performing pair
+	•	Most used strategy
+	•	Average RR
+
+⸻
+
+6️⃣ Free vs Pro Logic
+	•	Free users limited to 20 trades
+	•	Pro users unlimited
+	•	Structure backend to support subscription logic
+
+⸻
+
+Code Requirements:
+	•	Clean folder structure (client/server)
+	•	Well-commented code
+	•	Use environment variables
+	•	Proper error handling
+	•	Clean UI with spacing and modern typography
+	•	Dark mode design (trader aesthetic)
+
+⸻
+
+Deliver:
+	1.	Full frontend code
+	2.	Full backend code
+	3.	Folder structure explanation
+	4.	Setup instructions
+	5.	Database schema
+	6.	API route list
+
+Make this production-ready level.

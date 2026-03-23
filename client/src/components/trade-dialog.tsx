@@ -39,10 +39,13 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
   const [open, setOpen] = useState(false);
   const createTrade = useCreateTrade();
   const updateTrade = useUpdateTrade();
-  
+
   const isEditing = !!trade;
 
-  const form = useForm<InsertTrade>({
+  const [beforeImg, setBeforeImg] = useState<string | null>(trade?.beforeImg || null);
+  const [afterImg, setAfterImg] = useState<string | null>(trade?.afterImg || null);
+
+  const form = useForm<InsertTrade & { beforeImg?: string; afterImg?: string }>({
     resolver: zodResolver(insertTradeSchema),
     defaultValues: trade ? {
       pair: trade.pair,
@@ -64,19 +67,36 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
       result: "open",
       strategy: "",
       notes: "",
+      beforeImg: null,
+      afterImg: null,
     },
   });
 
   const onSubmit = (data: InsertTrade) => {
     const mutation = isEditing ? updateTrade : createTrade;
-    
+    const tradeData = {
+      ...data,
+      beforeImg,
+      afterImg,
+    };
     // @ts-ignore - handle id in mutation wrapper
-    mutation.mutate(isEditing ? { id: trade.id, ...data } : data, {
+    mutation.mutate(isEditing ? { id: trade.id, ...tradeData } : tradeData, {
       onSuccess: () => {
         setOpen(false);
         form.reset();
+        setBeforeImg(null);
+        setAfterImg(null);
       },
     });
+  };
+
+  // Helper to convert file to base64
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setter: (v: string | null) => void) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setter(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -140,10 +160,10 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
                   <FormItem>
                     <FormLabel>Entry</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.00001" 
-                        {...field} 
+                      <Input
+                        type="number"
+                        step="0.00001"
+                        {...field}
                         onChange={e => field.onChange(parseFloat(e.target.value))}
                         className="font-mono"
                       />
@@ -159,10 +179,10 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
                   <FormItem>
                     <FormLabel>Stop Loss</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.00001" 
-                        {...field} 
+                      <Input
+                        type="number"
+                        step="0.00001"
+                        {...field}
                         onChange={e => field.onChange(parseFloat(e.target.value))}
                         className="font-mono text-rose-500"
                       />
@@ -178,10 +198,10 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
                   <FormItem>
                     <FormLabel>Take Profit</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.00001" 
-                        {...field} 
+                      <Input
+                        type="number"
+                        step="0.00001"
+                        {...field}
                         onChange={e => field.onChange(parseFloat(e.target.value))}
                         className="font-mono text-emerald-500"
                       />
@@ -200,10 +220,10 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
                   <FormItem>
                     <FormLabel>Risk %</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.1" 
-                        {...field} 
+                      <Input
+                        type="number"
+                        step="0.1"
+                        {...field}
                         onChange={e => field.onChange(parseFloat(e.target.value))}
                         className="font-mono"
                       />
@@ -265,6 +285,22 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
               )}
             />
 
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-medium mb-1">Before Screenshot</label>
+                <input type="file" accept="image/*" onChange={e => handleFileChange(e, setBeforeImg)} />
+                {beforeImg && (
+                  <img src={beforeImg} alt="Before Screenshot" className="mt-2 rounded max-h-32 border" />
+                )}
+              </div>
+              <div>
+                <label className="block font-medium mb-1">After Screenshot</label>
+                <input type="file" accept="image/*" onChange={e => handleFileChange(e, setAfterImg)} />
+                {afterImg && (
+                  <img src={afterImg} alt="After Screenshot" className="mt-2 rounded max-h-32 border" />
+                )}
+              </div>
+            </div>
             <Button type="submit" className="w-full" disabled={createTrade.isPending || updateTrade.isPending}>
               {createTrade.isPending || updateTrade.isPending ? "Saving..." : isEditing ? "Update Trade" : "Log Trade"}
             </Button>

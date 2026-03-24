@@ -6,8 +6,13 @@ import {
   BookOpen, 
   LogOut, 
   Menu,
-  X,
-  TrendingUp
+  TrendingUp,
+  Calendar,
+  FileText,
+  Settings,
+  Map,
+  GraduationCap,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -20,15 +25,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Journal', href: '/journal', icon: BookOpen },
-    { name: 'Analytics', href: '/analytics', icon: LineChart },
+    { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
+    { name: 'Journal', href: '/app/journal', icon: BookOpen },
+    { name: 'Calendar', href: '/app/journal/calendar', icon: Calendar },
+    { name: 'Analytics', href: '/app/analytics', icon: LineChart },
+    { name: 'Reports', href: '/app/reports', icon: FileText },
+    { name: 'Learning', href: '/app/learning', icon: GraduationCap },
+    { name: 'Profile', href: '/app/profile', icon: User },
+    { name: 'Settings', href: '/app/settings', icon: Settings },
+    { name: 'Roadmap', href: '/app/roadmap', icon: Map },
   ];
 
   const NavContent = () => (
     <div className="flex flex-col h-full gap-4">
-      <div className="flex items-center gap-2 px-2 py-4">
-        <div className="p-2 rounded-lg bg-primary/10">
+      <div className="flex items-center gap-3 px-2 py-4">
+        <div className="inline-block p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 backdrop-blur-sm">
           <TrendingUp className="w-6 h-6 text-primary" />
         </div>
         <span className="font-bold text-xl tracking-tight">EdgeJournal</span>
@@ -87,8 +98,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <div className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-card/50 backdrop-blur-xl sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-primary" />
+        <div className="flex items-center gap-3">
+          <div className="inline-block p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 backdrop-blur-sm">
+            <TrendingUp className="w-6 h-6 text-primary" />
+          </div>
           <span className="font-bold text-lg">EdgeJournal</span>
         </div>
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>

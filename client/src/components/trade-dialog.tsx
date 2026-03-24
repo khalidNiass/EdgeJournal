@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusCircle } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type TradeDialogProps = {
   trade?: Trade;
@@ -45,7 +45,14 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
   const [beforeImg, setBeforeImg] = useState<string | null>(trade?.beforeImg || null);
   const [afterImg, setAfterImg] = useState<string | null>(trade?.afterImg || null);
 
-  const form = useForm<InsertTrade & { beforeImg?: string; afterImg?: string }>({
+  const form = useForm<InsertTrade & {
+    beforeImg?: string;
+    afterImg?: string;
+    durationMinutes?: number;
+    accountSize?: number;
+    positionSize?: number;
+    livePrice?: number;
+  }>({
     resolver: zodResolver(insertTradeSchema),
     defaultValues: trade ? {
       pair: trade.pair,
@@ -57,6 +64,10 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
       result: trade.result || undefined,
       strategy: trade.strategy || undefined,
       notes: trade.notes || undefined,
+      durationMinutes: undefined,
+      accountSize: 10000,
+      positionSize: undefined,
+      livePrice: undefined,
     } : {
       pair: "",
       entryPrice: 0,
@@ -69,8 +80,42 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
       notes: "",
       beforeImg: null,
       afterImg: null,
+      durationMinutes: 0,
+      accountSize: 10000,
+      positionSize: 0,
+      livePrice: undefined,
     },
   });
+
+  const rMultiple = useMemo(() => {
+    const entry = form.watch("entryPrice");
+    const stop = form.watch("stopLoss");
+    const take = form.watch("takeProfit");
+    const positionType = form.watch("positionType");
+    if (!entry || !stop || !take) return null;
+    const risk = positionType === "short" ? stop - entry : entry - stop;
+    if (risk <= 0) return null;
+    const reward = positionType === "short" ? entry - take : take - entry;
+    return Math.round((reward / risk) * 100) / 100;
+  }, [form.watch("entryPrice"), form.watch("stopLoss"), form.watch("takeProfit"), form.watch("positionType")]);
+
+  const positionSize = useMemo(() => {
+    const accountSize = form.watch("accountSize") || 0;
+    const riskPercent = form.watch("riskPercent") || 0;
+    const entry = form.watch("entryPrice") || 0;
+    const stop = form.watch("stopLoss") || 0;
+    const positionType = form.watch("positionType");
+    const riskPerUnit = positionType === "short" ? stop - entry : entry - stop;
+    if (riskPerUnit <= 0 || accountSize <= 0 || riskPercent <= 0) return 0;
+    const riskAmount = (accountSize * riskPercent) / 100;
+    return Math.round((riskAmount / riskPerUnit) * 100) / 100;
+  }, [
+    form.watch("accountSize"),
+    form.watch("riskPercent"),
+    form.watch("entryPrice"),
+    form.watch("stopLoss"),
+    form.watch("positionType"),
+  ]);
 
   const onSubmit = (data: InsertTrade) => {
     const mutation = isEditing ? updateTrade : createTrade;
@@ -152,6 +197,34 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="durationMinutes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trade Duration (minutes)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="1"
+                        {...field}
+                        onChange={e => field.onChange(parseFloat(e.target.value))}
+                        className="font-mono"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="rounded-lg bg-muted/30 p-3 text-sm">
+                <div className="text-xs text-muted-foreground">Duration (preview)</div>
+                <div className="mt-1 font-mono">
+                  {form.watch("durationMinutes") ? `${form.watch("durationMinutes")} min` : "—"}
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -212,6 +285,38 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
               />
             </div>
 
+            <div className="rounded-lg bg-muted/30 p-3 text-sm">
+              <div className="text-xs text-muted-foreground">R Multiple (preview)</div>
+              <div className="mt-1 font-mono">{rMultiple !== null ? `${rMultiple}R` : "—"}</div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="accountSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Size</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        onChange={e => field.onChange(parseFloat(e.target.value))}
+                        className="font-mono"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="rounded-lg bg-muted/30 p-3 text-sm">
+                <div className="text-xs text-muted-foreground">Position Size (auto)</div>
+                <div className="mt-1 font-mono">{positionSize ? positionSize : "—"}</div>
+                <div className="text-[10px] text-muted-foreground mt-1">Based on account size, risk %, and stop distance.</div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -255,6 +360,11 @@ export function TradeDialog({ trade, trigger }: TradeDialogProps) {
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="rounded-lg bg-muted/30 p-3 text-sm">
+              <div className="text-xs text-muted-foreground">Live Price (coming soon)</div>
+              <div className="mt-1 font-mono">--</div>
             </div>
 
             <FormField

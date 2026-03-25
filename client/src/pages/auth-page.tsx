@@ -40,6 +40,9 @@ export default function AuthPage() {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
+  const [showReset, setShowReset] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const [onboarding, setOnboarding] = useState({
     tradingStyle: "",
     primaryGoal: "",
@@ -258,11 +261,84 @@ export default function AuthPage() {
                           type="button"
                           variant="link"
                           className="px-0 text-sm"
-                          onClick={() => toast({ title: "Reset link sent", description: "Check your inbox (demo)." })}
+                          onClick={() => {
+                            const currentUser = loginForm.getValues("username");
+                            if (currentUser.includes("@")) {
+                              setResetEmail(currentUser);
+                            }
+                            setShowReset(true);
+                            setResetSent(false);
+                          }}
                         >
                           Forgot password?
                         </Button>
                       </div>
+                      {showReset && (
+                        <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                          {!resetSent ? (
+                            <>
+                              <div className="text-sm font-medium">Reset your password</div>
+                              <div className="text-xs text-muted-foreground">
+                                We’ll send a reset link to your email address.
+                              </div>
+                              <Input
+                                type="email"
+                                placeholder="you@email.com"
+                                value={resetEmail}
+                                onChange={(e) => setResetEmail(e.target.value)}
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setShowReset(false);
+                                    setResetSent(false);
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={() => {
+                                    setResetSent(true);
+                                    toast({ title: "Reset link sent", description: "Check your inbox (demo)." });
+                                  }}
+                                >
+                                  Send reset link
+                                </Button>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-sm">
+                              Check your inbox for a reset link.
+                              <div className="text-xs text-muted-foreground mt-1">
+                                Didn’t receive it? Check spam or resend.
+                              </div>
+                              <div className="flex gap-2 mt-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setResetSent(false)}
+                                >
+                                  Resend
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => setShowReset(false)}
+                                >
+                                  Close
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <Button type="submit" className="w-full" disabled={isLoginPending}>
                         {isLoginPending ? "Logging in..." : "Login"}
                       </Button>

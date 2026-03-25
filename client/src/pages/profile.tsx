@@ -1,6 +1,5 @@
 import DashboardLayout from "@/components/layout";
 import { useAuth } from "@/hooks/use-auth";
-import { useTheme } from "@/hooks/use-theme";
 import { useAnalytics, useTrades } from "@/hooks/use-trades";
 import { demoTrades } from "@/lib/demo-trades";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -40,7 +38,6 @@ export default function Profile() {
   const { data: trades, isLoading: isLoadingTrades } = useTrades();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { theme, toggle } = useTheme();
 
   const realTrades = trades ?? [];
   const showingDemo = realTrades.length === 0 && !isLoadingTrades;
@@ -53,13 +50,7 @@ export default function Profile() {
     tradingStyle: "",
     bio: "",
   });
-
-  const [preferences, setPreferences] = useState({
-    dailySummary: true,
-    weeklySummary: true,
-    tradeReminders: true,
-    marketNews: false,
-  });
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
   const initials = useMemo(() => {
     if (!user?.username) return "U";
@@ -137,7 +128,7 @@ export default function Profile() {
           </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6">
           <Card>
             <CardContent className="p-6 space-y-6">
               <div>
@@ -192,105 +183,24 @@ export default function Profile() {
                   />
                 </div>
               </div>
-              <Button
-                className="w-full"
-                onClick={() => toast({ title: "Profile updated", description: "Changes saved locally (demo)." })}
-              >
-                Save Changes
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    setLastSavedAt(new Date());
+                    toast({ title: "Profile updated", description: "Changes saved locally (demo)." });
+                  }}
+                >
+                  Save Changes
+                </Button>
+                {lastSavedAt && (
+                  <div className="text-xs text-muted-foreground text-center">
+                    Saved {lastSavedAt.toLocaleTimeString()}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
-
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold">Preferences</h3>
-                  <p className="text-sm text-muted-foreground">Control alerts and summaries</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">Dark mode</div>
-                    <div className="text-xs text-muted-foreground">Toggle the app theme</div>
-                  </div>
-                  <Switch
-                    checked={theme === "dark"}
-                    onCheckedChange={toggle}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">Daily summary</div>
-                    <div className="text-xs text-muted-foreground">Receive a daily performance email</div>
-                  </div>
-                  <Switch
-                    checked={preferences.dailySummary}
-                    onCheckedChange={(checked) => setPreferences((prev) => ({ ...prev, dailySummary: checked }))}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">Weekly summary</div>
-                    <div className="text-xs text-muted-foreground">Weekly performance recap</div>
-                  </div>
-                  <Switch
-                    checked={preferences.weeklySummary}
-                    onCheckedChange={(checked) => setPreferences((prev) => ({ ...prev, weeklySummary: checked }))}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">Trade reminders</div>
-                    <div className="text-xs text-muted-foreground">Get nudges to journal after a trade</div>
-                  </div>
-                  <Switch
-                    checked={preferences.tradeReminders}
-                    onCheckedChange={(checked) => setPreferences((prev) => ({ ...prev, tradeReminders: checked }))}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">Market news</div>
-                    <div className="text-xs text-muted-foreground">Weekly macro and volatility recap</div>
-                  </div>
-                  <Switch
-                    checked={preferences.marketNews}
-                    onCheckedChange={(checked) => setPreferences((prev) => ({ ...prev, marketNews: checked }))}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold">Security</h3>
-                  <p className="text-sm text-muted-foreground">Update your password</p>
-                </div>
-                <div className="grid gap-3">
-                  <div className="grid gap-2">
-                    <Label htmlFor="currentPassword">Current password</Label>
-                    <Input id="currentPassword" type="password" placeholder="••••••••" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="newPassword">New password</Label>
-                    <Input id="newPassword" type="password" placeholder="••••••••" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="confirmPassword">Confirm new password</Label>
-                    <Input id="confirmPassword" type="password" placeholder="••••••••" />
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => toast({ title: "Password update", description: "Password change coming soon." })}
-                >
-                  Update Password
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </DashboardLayout>

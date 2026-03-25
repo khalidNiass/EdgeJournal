@@ -5,7 +5,11 @@ import { TradeDialog } from "@/components/trade-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Loader2, TrendingUp, DollarSign, Activity, Target } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, TrendingUp, DollarSign, Activity, Target, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { 
@@ -23,6 +27,11 @@ export default function Dashboard() {
   const { data: analytics, isLoading: isLoadingAnalytics } = useAnalytics();
   const { data: trades, isLoading: isLoadingTrades } = useTrades();
   const [tourOpen, setTourOpen] = useState(false);
+  const [summaryEnabled, setSummaryEnabled] = useState(true);
+  const [summaryFrequency, setSummaryFrequency] = useState("weekly");
+  const [summaryDay, setSummaryDay] = useState("Friday");
+  const [summaryTime, setSummaryTime] = useState("17:00");
+  const [summaryEmail, setSummaryEmail] = useState("you@email.com");
 
   if (isLoadingAnalytics || isLoadingTrades) {
     return (
@@ -232,9 +241,65 @@ export default function Dashboard() {
           </Card>
           <Card>
             <CardContent className="p-6 space-y-4">
-              <h3 className="text-lg font-semibold">Weekly Summary</h3>
-              <div className="text-sm text-muted-foreground">Automated email recap (UI preview)</div>
-              <Button variant="outline">Send test summary</Button>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Email Recap</h3>
+                  <div className="text-sm text-muted-foreground">Automated performance summary</div>
+                </div>
+                <Switch checked={summaryEnabled} onCheckedChange={setSummaryEnabled} />
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <label className="text-xs text-muted-foreground">Frequency</label>
+                  <Select value={summaryFrequency} onValueChange={setSummaryFrequency}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-xs text-muted-foreground">Preferred time</label>
+                  <Input type="time" value={summaryTime} onChange={(e) => setSummaryTime(e.target.value)} />
+                </div>
+                {summaryFrequency === "weekly" && (
+                  <div className="grid gap-2">
+                    <label className="text-xs text-muted-foreground">Day of week</label>
+                    <Select value={summaryDay} onValueChange={setSummaryDay}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                          <SelectItem key={day} value={day}>{day}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div className="grid gap-2">
+                  <label className="text-xs text-muted-foreground">Deliver to</label>
+                  <Input
+                    type="email"
+                    value={summaryEmail}
+                    onChange={(e) => setSummaryEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant="secondary" className="gap-1">
+                  <Mail className="h-3 w-3" /> Summary preview
+                </Badge>
+                Includes win rate, net P/L, best strategy, and notes.
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline">Preview email</Button>
+                <Button>Send test summary</Button>
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -19,6 +19,8 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import analyticsPreview from "@/assets/Analytics Preview.png";
+import productPreview from "@/assets/preview.png";
 
 const features = [
   {
@@ -28,12 +30,12 @@ const features = [
   },
   {
     title: "Performance analytics",
-    desc: "Win rate, R multiples, equity curves, and daily insights at a glance.",
+    desc: "Win rate, risk units, equity curves, and daily insights at a glance.",
     icon: LineChart,
   },
   {
-    title: "Edge discovery",
-    desc: "Spot patterns, filter noise, and scale what’s working with confidence.",
+    title: "Learning space",
+    desc: "Guided lessons that connect directly to your journal and execution.",
     icon: Brain,
   },
 ];
@@ -43,7 +45,8 @@ const benefits = [
   "Before/after chart gallery",
   "Trade notes + emotions",
   "Equity curve tracking",
-  "Quick filters & search",
+  "Calendar view + trade markers",
+  "PDF export for reports",
   "Secure by design",
 ];
 
@@ -52,18 +55,27 @@ const logos = ["Apex Desk", "Pulse Capital", "Northbridge", "Bluecrest", "Orion"
 const testimonials = [
   {
     name: "T. Walker",
-    role: "Futures trader",
+    role: "Futures Trader",
+    firm: "Apex Desk",
     quote: "The journaling flow is fast and focused. My A‑setups improved in two weeks.",
+    initials: "TW",
+    tag: "Execution",
   },
   {
     name: "R. Chen",
-    role: "FX swing trader",
-    quote: "The equity curve and R multiple view made my review process much clearer.",
+    role: "FX Swing Trader",
+    firm: "Pulse Capital",
+    quote: "The equity curve and risk units view made my review process much clearer.",
+    initials: "RC",
+    tag: "Analytics",
   },
   {
     name: "S. Patel",
-    role: "Prop firm",
+    role: "Prop Firm Lead",
+    firm: "Northbridge",
     quote: "Best trading journal I’ve used. Clean, disciplined, and genuinely useful.",
+    initials: "SP",
+    tag: "Discipline",
   },
 ];
 
@@ -91,7 +103,7 @@ const faqs = [
   },
   {
     q: "Can I export my trades?",
-    a: "CSV export is on the roadmap. We can add it next if you want.",
+    a: "Yes. You can export a clean PDF report from your journal.",
   },
   {
     q: "Is my data secure?",
@@ -120,12 +132,13 @@ export default function LandingPage() {
             <a className="hover:text-foreground" href="#faq">FAQ</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
-              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </Button>
-            <Link href="/auth">
-              <Button variant="ghost">Sign In</Button>
-            </Link>
+            <button
+              onClick={toggle}
+              aria-label="Toggle theme"
+              className="h-8 w-8 md:h-9 md:w-9 rounded-full border border-border/70 bg-card/70 text-muted-foreground hover:text-foreground hover:border-border transition-colors flex items-center justify-center"
+            >
+              {theme === "dark" ? <Sun className="w-3.5 h-3.5 md:w-4 md:h-4" /> : <Moon className="w-3.5 h-3.5 md:w-4 md:h-4" />}
+            </button>
             <Link href="/auth">
               <Button>Get Started</Button>
             </Link>
@@ -271,8 +284,15 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Target className="w-4 h-4" /> Product Preview
                 </div>
-                <div className="aspect-[16/10] rounded-xl bg-muted/30" />
-                <p className="text-sm text-muted-foreground">Clean journal grid, trade details, and screenshots.</p>
+                <div className="aspect-[16/10] rounded-xl bg-muted/30 overflow-hidden border border-border/60">
+                  <img
+                    src={productPreview}
+                    alt="Product preview dashboard"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">Journal grid, trade details, calendar, and PDF exports.</p>
               </CardContent>
             </Card>
             <Card className="border-none bg-card/70 shadow-sm">
@@ -280,26 +300,52 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Trophy className="w-4 h-4" /> Analytics Preview
                 </div>
-                <div className="aspect-[16/10] rounded-xl bg-muted/30" />
-                <p className="text-sm text-muted-foreground">Equity curve, daily performance, and insights.</p>
+                <div className="aspect-[16/10] rounded-xl bg-muted/30 overflow-hidden border border-border/60">
+                  <img
+                    src={analyticsPreview}
+                    alt="Analytics preview dashboard"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">Equity curve, insights, and learning recommendations.</p>
               </CardContent>
             </Card>
-          </div>
-        </section>
+            </div>
+          </section>
 
         <section id="testimonials" className="max-w-7xl mx-auto px-6 pb-20">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="text-sm text-muted-foreground">Trusted by focused traders</div>
+              <h2 className="text-3xl font-bold">What professionals say</h2>
+            </div>
+            <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
+              <Star className="w-4 h-4 text-amber-400" /> 4.9 average rating
+            </div>
+          </div>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((item) => (
               <Card key={item.name} className="border-none bg-card/70 shadow-sm">
-                <CardContent className="p-6 space-y-3">
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {[0, 1, 2, 3, 4].map((idx) => (
-                      <Star key={idx} className="w-4 h-4" />
-                    ))}
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-amber-400">
+                      {[0, 1, 2, 3, 4].map((idx) => (
+                        <Star key={idx} className="w-4 h-4" />
+                      ))}
+                    </div>
+                    <Badge variant="secondary">{item.tag}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">“{item.quote}”</p>
-                  <div className="text-sm font-semibold">{item.name}</div>
-                  <div className="text-xs text-muted-foreground">{item.role}</div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">“{item.quote}”</p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/30 to-primary/5 border border-primary/20 flex items-center justify-center text-sm font-bold">
+                      {item.initials}
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">{item.name}</div>
+                      <div className="text-xs text-muted-foreground">{item.role} · {item.firm}</div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -369,9 +415,7 @@ export default function LandingPage() {
                 <Link href="/auth">
                   <Button size="lg">Get Started</Button>
                 </Link>
-                <Link href="/auth">
-                  <Button size="lg" variant="outline">Sign In</Button>
-                </Link>
+                
               </div>
             </CardContent>
           </Card>

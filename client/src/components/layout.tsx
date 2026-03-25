@@ -31,7 +31,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Analytics', href: '/app/analytics', icon: LineChart },
     { name: 'Reports', href: '/app/reports', icon: FileText },
     { name: 'Learning', href: '/app/learning', icon: GraduationCap },
-    { name: 'Profile', href: '/app/profile', icon: User },
     { name: 'Settings', href: '/app/settings', icon: Settings },
     { name: 'Roadmap', href: '/app/roadmap', icon: Map },
   ];
@@ -69,19 +68,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       <div className="pt-4 mt-auto border-t border-border space-y-4">
-        <div className="flex items-center gap-3 px-2">
-          <Avatar className="w-8 h-8 border border-border">
-            <AvatarFallback className="bg-muted text-xs font-mono">
-              {user?.username.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.username}</p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user?.isPro ? 'Pro Plan' : 'Free Plan'}
-            </p>
+        <Link href="/app/profile">
+          <div
+            className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-colors hover:bg-muted/60"
+            onClick={() => setIsMobileOpen(false)}
+          >
+            <Avatar className="w-8 h-8 border border-border">
+              <AvatarFallback className="bg-muted text-xs font-mono">
+                {user?.username.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{user?.username}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.isPro ? 'Pro Plan' : 'Free Plan'}
+              </p>
+            </div>
           </div>
-        </div>
+        </Link>
         <Button 
           variant="outline" 
           className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20"

@@ -22,6 +22,7 @@ export default function EditProfile() {
     tradingStyle: "",
     bio: "",
   });
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
   return (
     <DashboardLayout>
@@ -89,15 +90,23 @@ export default function EditProfile() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
-                onClick={() => toast({ title: "Profile updated", description: "Changes saved locally (demo)." })}
+                onClick={() => {
+                  setLastSavedAt(new Date());
+                  toast({ title: "Profile updated", description: "Changes saved locally (demo)." });
+                }}
               >
                 Save Changes
               </Button>
               <Button variant="outline" onClick={() => setLocation("/app/profile")}>
                 Cancel
               </Button>
+              {lastSavedAt && (
+                <span className="text-xs text-muted-foreground">
+                  Saved {lastSavedAt.toLocaleTimeString()}
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>

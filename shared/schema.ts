@@ -23,10 +23,20 @@ export const trades = pgTable("trades", {
   strategy: text("strategy"),
   notes: text("notes"),
   date: timestamp("date").defaultNow().notNull(),
+  exitTime: timestamp("exit_time"),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, isPro: true });
-export const insertTradeSchema = createInsertSchema(trades).omit({ id: true, userId: true, date: true });
+export const insertTradeSchema = createInsertSchema(trades, {
+  date: z.preprocess((value) => {
+    if (!value) return undefined;
+    return value instanceof Date ? value : new Date(String(value));
+  }, z.date().optional()),
+  exitTime: z.preprocess((value) => {
+    if (value === null || value === undefined || value === "") return null;
+    return value instanceof Date ? value : new Date(String(value));
+  }, z.date().nullable().optional()),
+}).omit({ id: true, userId: true });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

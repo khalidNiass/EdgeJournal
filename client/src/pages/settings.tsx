@@ -2,12 +2,16 @@ import DashboardLayout from "@/components/layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useTheme } from "@/hooks/use-theme";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useLocation } from "wouter";
 
 export default function SettingsPage() {
   const { theme, toggle } = useTheme();
+  const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [prefs, setPrefs] = useState({
     dailySummary: true,
@@ -21,7 +25,10 @@ export default function SettingsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage preferences and account (UI preview)</p>
+          <p className="text-muted-foreground mt-1">Manage preferences and account</p>
+        </div>
+        <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+          Settings are in preview mode. Changes are saved locally until backend sync is enabled.
         </div>
 
         <Card className="border-none bg-card/70 shadow-sm">
@@ -74,6 +81,39 @@ export default function SettingsPage() {
                 onCheckedChange={(checked) => setPrefs((prev) => ({ ...prev, marketNews: checked }))}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none bg-card/70 shadow-sm">
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold">Security</h3>
+              <p className="text-sm text-muted-foreground">Update your password</p>
+            </div>
+            <div className="grid gap-3">
+              <div className="grid gap-2">
+                <Label htmlFor="currentPassword">Current password</Label>
+                <Input id="currentPassword" type="password" placeholder="••••••••" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="newPassword">New password</Label>
+                <Input id="newPassword" type="password" placeholder="••••••••" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="confirmPassword">Confirm new password</Label>
+                <Input id="confirmPassword" type="password" placeholder="••••••••" />
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Password updates will be fully enabled when backend authentication is connected.
+            </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => toast({ title: "Password update", description: "Password change coming soon." })}
+            >
+              Update Password
+            </Button>
           </CardContent>
         </Card>
 
